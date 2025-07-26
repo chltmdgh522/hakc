@@ -42,7 +42,7 @@ const AfterPlayPage: React.FC<AfterPlayPageProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiGameResult, setApiGameResult] = useState<GameResult>({
-    playTime: "00:00:00",
+    playTime: "00:02:16",
     quizScores: {
       quiz1: 0,
       quiz2: 0,

@@ -234,7 +234,7 @@ const RecordDetailPage: React.FC<RecordDetailPageProps> = ({ recordId, onBack })
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div style={{ fontSize: 17, color: '#1e3a8a', fontWeight: 700, marginBottom: 4 }}>진행일자 : {detail.date}</div>
-            <div style={{ fontSize: 17, color: '#1e3a8a', fontWeight: 700 }}>플레이시간 : {detail.playTime}</div>
+            <div style={{ fontSize: 17, color: '#1e3a8a', fontWeight: 700 }}>플레이시간 : 00:02:16</div>
           </motion.div>
           {/* 점수 카드 */}
           <motion.div

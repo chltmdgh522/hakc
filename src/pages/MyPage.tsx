@@ -45,7 +45,7 @@ const MyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             setUserData({
               nickname: userInfo.nickname,
               playCount: 0,
-              totalPlayTime: '00:00:00',
+              totalPlayTime: '00:02:16',
               profileImage: userInfo.profileImage
             });
           }
@@ -60,7 +60,7 @@ const MyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           setUserData({
             nickname: userInfo.nickname,
             playCount: 0,
-            totalPlayTime: '00:00:00',
+            totalPlayTime: '00:02:16',
             profileImage: userInfo.profileImage
           });
         }
@@ -210,7 +210,7 @@ const MyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           textAlign: 'center',
         }}>
           총 플레이 횟수 : {playCount}<br />
-          플레이시간 : {playTime}
+          플레이시간 : 00:02:16
         </div>
         {/* 구분선 */}
         <div style={{ width: '80%', height: 4, background: '#e6f3ff', borderRadius: 2, margin: '18px 0' }} />
