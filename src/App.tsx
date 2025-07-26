@@ -109,22 +109,10 @@ const AppContent: React.FC = () => {
     console.log('🔍 App: isLoggedInState를 true로 설정 완료');
   };
 
-  const handleLogout = async () => {
-    console.log('🔍 App: handleLogout 호출됨');
-    console.log('🔍 App: 현재 isLoggedInState:', isLoggedInState);
-    
-    try {
-      // AuthService.logout() 호출
-      const { AuthService } = await import('./services/authService');
-      await AuthService.logout();
-      console.log('🔍 App: AuthService.logout() 완료');
-    } catch (error) {
-      console.error('🔍 App: AuthService.logout() 실패:', error);
-    }
-    
+  const handleLogout = () => {
+    console.log('🔍 App: 로그아웃 처리');
     setIsLoggedInState(false);
     setUser(null);
-    console.log('🔍 App: 로그아웃 상태 설정 완료 (isLoggedInState = false)');
   };
 
   // 로딩 중일 때 로딩 화면 표시
