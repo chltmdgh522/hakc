@@ -7,6 +7,7 @@ import customerServiceBtn from "../assets/Setting/고객센터버튼.png";
 import noticeBtn from "../assets/Setting/공지사항버튼.png";
 import onBtn from "../assets/Setting/ON버튼.png";
 import offBtn from "../assets/Setting/OFF 버튼.png";
+import { useMusic } from "../contexts/MusicContext";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -14,8 +15,8 @@ interface SettingsModalProps {
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+  const { isMusicOn, toggleMusic } = useMusic();
   const [soundEffectOn, setSoundEffectOn] = useState(true);
-  const [bgMusicOn, setBgMusicOn] = useState(true);
   const [kakaoNotificationOn, setKakaoNotificationOn] = useState(true);
   const [pushAlarmOn, setPushAlarmOn] = useState(false);
   const [promoAlarmOn, setPromoAlarmOn] = useState(false);
@@ -129,10 +130,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                 width: "100px",
                 height: "auto",
                 cursor: "pointer",
-                filter: bgMusicOn ? "brightness(1)" : "brightness(0.5) grayscale(0.5)",
+                filter: isMusicOn ? "brightness(1)" : "brightness(0.5) grayscale(0.5)",
                 transition: "filter 0.3s ease"
               }}
-              onClick={() => setBgMusicOn(!bgMusicOn)}
+              onClick={toggleMusic}
             />
           </div>
 

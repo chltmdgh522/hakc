@@ -4,9 +4,10 @@ import LoginPage from './pages/LoginPage';
 import TempLoginPage from './pages/TempLoginPage';
 import FirstScreenPage from './pages/FirstScreenPage';
 import OAuthSuccess from './pages/OAuthSuccess';
-import { useWindowSize } from './hooks/useWindowSize';
+import { useWindowSize } from './hooks';
 import ErrorBoundary from './components/ErrorBoundary';
 import { checkAutoLogin, isLoggedIn } from './utils/auth';
+import { MusicProvider } from './contexts/MusicContext';
 import type { AuthUser } from './types';
 
 function getBoxStyle(width: number, height: number) {
@@ -93,16 +94,9 @@ const App: React.FC = () => {
     console.log('App: handleLoginSuccess 호출됨');
     console.log('App: isLoggedInState 변경 전:', isLoggedInState);
     
-    // 강제로 상태 변경을 트리거하기 위해 false로 먼저 설정
-    setIsLoggedInState(false);
-    
-    // 다음 틱에서 true로 설정
-    setTimeout(() => {
-      console.log('App: isLoggedInState를 true로 설정');
-      setIsLoggedInState(true);
-    }, 0);
-    
-    console.log('App: 상태 변경 스케줄링 완료');
+    // 즉시 상태 변경
+    setIsLoggedInState(true);
+    console.log('App: isLoggedInState를 true로 설정 완료');
   };
 
   // 로딩 중일 때 로딩 화면 표시
@@ -125,19 +119,21 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="fixed inset-0 flex items-center justify-center bg-[#ECEEEF]">
-        <div style={boxStyle}>
-          <Router>
-            <Routes>
-              <Route path="/" element={
-                isLoggedInState ? <FirstScreenPage /> : <LoginPage onLoginSuccess={handleLoginSuccess} />
-              } />
-              <Route path="/temp-login" element={<TempLoginPage onLoginSuccess={handleLoginSuccess} />} />
-              <Route path="/oauth-success" element={<OAuthSuccess />} />
-            </Routes>
-          </Router>
+      <MusicProvider>
+        <div className="fixed inset-0 flex items-center justify-center bg-[#ECEEEF]">
+          <div style={boxStyle}>
+            <Router>
+              <Routes>
+                <Route path="/" element={
+                  isLoggedInState ? <FirstScreenPage /> : <LoginPage onLoginSuccess={handleLoginSuccess} />
+                } />
+                <Route path="/temp-login" element={<TempLoginPage onLoginSuccess={handleLoginSuccess} />} />
+                <Route path="/oauth-success" element={<OAuthSuccess />} />
+              </Routes>
+            </Router>
+          </div>
         </div>
-      </div>
+      </MusicProvider>
     </ErrorBoundary>
   );
 };
