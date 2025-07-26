@@ -19,13 +19,40 @@ export class AuthService {
 
   // 로그아웃
   static async logout(): Promise<boolean> {
+    console.log('🔍 AuthService: 로그아웃 시작');
+    
+    // 로컬 스토리지 정리 (먼저 실행)
     try {
-      await api.post('/oauth2/logout');
-      return true;
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
-      return false;
+      const { clearAuthToken, clearUserInfo } = await import('../utils/auth');
+      clearAuthToken();
+      clearUserInfo();
+      console.log('🔍 AuthService: 로컬 스토리지 정리 완료');
+    } catch (clearError) {
+      console.error('🔍 AuthService: 로컬 스토리지 정리 실패:', clearError);
     }
+    
+    // 카카오 SDK 로그아웃 (있는 경우)
+    try {
+      const { kakaoLogout } = await import('../config/kakao');
+      kakaoLogout();
+      console.log('🔍 AuthService: 카카오 SDK 로그아웃 완료');
+    } catch (kakaoError) {
+      console.log('🔍 AuthService: 카카오 SDK 로그아웃 실패 (무시):', kakaoError);
+    }
+    
+    // 백엔드 로그아웃 API 호출 (실패해도 무시)
+    try {
+      console.log('🔍 AuthService: 백엔드 로그아웃 API 호출 시도');
+      await api.post('/oauth2/logout');
+      console.log('🔍 AuthService: 백엔드 로그아웃 API 호출 성공');
+    } catch (error) {
+      console.log('🔍 AuthService: 백엔드 로그아웃 API 실패 (무시):', error);
+    }
+    
+    // 로컬 로그아웃은 성공으로 처리
+    console.log('🔍 AuthService: 로그아웃 완료');
+    
+    return true;
   }
 
   // 마이페이지 정보 조회

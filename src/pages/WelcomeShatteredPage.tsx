@@ -6,6 +6,7 @@ import darkBg from "../assets/암흑배경.png";
 import crown from "../assets/박살난왕관.png";
 import dialog2 from "../assets/2_대사.png";
 import arrowRight from "../assets/but_오른쪽화살표.png";
+import { speakText, stopTTS } from "../utils/tts";
 
 interface WelcomeShatteredPageProps {
   nickname: string;
@@ -15,6 +16,11 @@ interface WelcomeShatteredPageProps {
 const WelcomeShatteredPage: React.FC<WelcomeShatteredPageProps> = ({ nickname, onNext }) => {
   const [currentStep, setCurrentStep] = useState<'welcome' | 'shattered'>('welcome');
   const [showArrow, setShowArrow] = useState(false);
+  const [isTTSPlaying, setIsTTSPlaying] = useState(false);
+
+  // TTS로 읽을 대사 텍스트들
+  const welcomeText = `${nickname}님, 감정의 세계에 오신 것을 환영합니다. 이곳에서 당신은 다양한 감정들을 경험하고 배울 수 있습니다. 준비되셨나요?`;
+  const shatteredText = "아, 이런! 감정의 왕관이 깨져버렸네요. 하지만 걱정하지 마세요. 당신의 도움이 필요합니다. 이 세계의 감정들을 다시 찾아주세요.";
 
   // Welcome 단계에서 3초 후 화살표 표시
   useEffect(() => {
@@ -26,13 +32,59 @@ const WelcomeShatteredPage: React.FC<WelcomeShatteredPageProps> = ({ nickname, o
     }
   }, [currentStep]);
 
-  const handleWelcomeClick = () => {
-    setCurrentStep('shattered');
-    setShowArrow(false);
+  const handleWelcomeClick = async () => {
+    // TTS가 재생 중이면 중지하고 다음 단계로
+    if (isTTSPlaying) {
+      stopTTS();
+      setIsTTSPlaying(false);
+      setCurrentStep('shattered');
+      setShowArrow(false);
+      return;
+    }
+
+    // TTS 재생
+    try {
+      setIsTTSPlaying(true);
+      await speakText(welcomeText, {
+        rate: 0.8,
+        pitch: 1.0,
+        volume: 1.0
+      });
+      setIsTTSPlaying(false);
+      setCurrentStep('shattered');
+      setShowArrow(false);
+    } catch (error) {
+      console.error('TTS 재생 실패:', error);
+      setIsTTSPlaying(false);
+      setCurrentStep('shattered');
+      setShowArrow(false);
+    }
   };
 
-  const handleShatteredClick = () => {
-    onNext?.();
+  const handleShatteredClick = async () => {
+    // TTS가 재생 중이면 중지하고 다음 페이지로
+    if (isTTSPlaying) {
+      stopTTS();
+      setIsTTSPlaying(false);
+      onNext?.();
+      return;
+    }
+
+    // TTS 재생
+    try {
+      setIsTTSPlaying(true);
+      await speakText(shatteredText, {
+        rate: 0.8,
+        pitch: 1.0,
+        volume: 1.0
+      });
+      setIsTTSPlaying(false);
+      onNext?.();
+    } catch (error) {
+      console.error('TTS 재생 실패:', error);
+      setIsTTSPlaying(false);
+      onNext?.();
+    }
   };
 
   return (
@@ -87,7 +139,9 @@ const WelcomeShatteredPage: React.FC<WelcomeShatteredPageProps> = ({ nickname, o
                     height: '30px',
                     cursor: 'pointer',
                     userSelect: 'none',
-                    zIndex: 11
+                    zIndex: 11,
+                    filter: isTTSPlaying ? 'brightness(0.7)' : 'brightness(1)',
+                    transition: 'filter 0.3s ease'
                   }}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -177,7 +231,9 @@ const WelcomeShatteredPage: React.FC<WelcomeShatteredPageProps> = ({ nickname, o
                 height: '30px',
                 cursor: 'pointer',
                 userSelect: 'none',
-                zIndex: 11
+                zIndex: 11,
+                filter: isTTSPlaying ? 'brightness(0.7)' : 'brightness(1)',
+                transition: 'filter 0.3s ease'
               }}
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -186,6 +242,29 @@ const WelcomeShatteredPage: React.FC<WelcomeShatteredPageProps> = ({ nickname, o
               draggable={false}
             />
           </motion.div>
+        </motion.div>
+      )}
+
+      {/* TTS 상태 표시 */}
+      {isTTSPlaying && (
+        <motion.div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            color: 'white',
+            fontSize: '14px',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            zIndex: 20
+          }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+        >
+          🔊 대사 재생 중...
         </motion.div>
       )}
     </AnimatePresence>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import TempLoginPage from './pages/TempLoginPage';
 import FirstScreenPage from './pages/FirstScreenPage';
@@ -35,7 +35,8 @@ function getBoxStyle(width: number, height: number) {
   };
 }
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const navigate = useNavigate();
   const [isLoggedInState, setIsLoggedInState] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -90,32 +91,68 @@ const App: React.FC = () => {
     initializeApp();
   }, []);
 
+  // 로그아웃 상태 변경 감지
+  useEffect(() => {
+    console.log('🔍 App: isLoggedInState 변경 감지:', isLoggedInState);
+    if (!isLoggedInState && !isLoading) {
+      console.log('🔍 App: 로그아웃 상태 감지, 로그인 페이지로 강제 이동');
+      navigate('/', { replace: true });
+    }
+  }, [isLoggedInState, isLoading, navigate]);
+
   const handleLoginSuccess = () => {
-    console.log('App: handleLoginSuccess 호출됨');
-    console.log('App: isLoggedInState 변경 전:', isLoggedInState);
+    console.log('🔍 App: handleLoginSuccess 호출됨');
+    console.log('🔍 App: isLoggedInState 변경 전:', isLoggedInState);
     
     // 즉시 상태 변경
     setIsLoggedInState(true);
-    console.log('App: isLoggedInState를 true로 설정 완료');
+    console.log('🔍 App: isLoggedInState를 true로 설정 완료');
+  };
+
+  const handleLogout = () => {
+    console.log('🔍 App: handleLogout 호출됨');
+    console.log('🔍 App: 현재 isLoggedInState:', isLoggedInState);
+    
+    setIsLoggedInState(false);
+    setUser(null);
+    console.log('🔍 App: 로그아웃 상태 설정 완료 (isLoggedInState = false)');
   };
 
   // 로딩 중일 때 로딩 화면 표시
   if (isLoading) {
     return (
-      <ErrorBoundary>
-        <div className="fixed inset-0 flex items-center justify-center bg-[#ECEEEF]">
-          <div style={boxStyle}>
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-600">로딩 중...</p>
-              </div>
-            </div>
-          </div>
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">로딩 중...</p>
         </div>
-      </ErrorBoundary>
+      </div>
     );
   }
+
+  return (
+    <Routes>
+      <Route path="/" element={
+        (() => {
+          console.log('🔍 App: 라우팅 조건 확인 - isLoggedInState:', isLoggedInState);
+          if (isLoggedInState) {
+            console.log('🔍 App: FirstScreenPage 렌더링');
+            return <FirstScreenPage onLogout={handleLogout} />;
+          } else {
+            console.log('🔍 App: LoginPage 렌더링');
+            return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+          }
+        })()
+      } />
+      <Route path="/temp-login" element={<TempLoginPage onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/oauth-success" element={<OAuthSuccess />} />
+    </Routes>
+  );
+};
+
+const App: React.FC = () => {
+  const { width, height } = useWindowSize();
+  const boxStyle = getBoxStyle(width, height);
 
   return (
     <ErrorBoundary>
@@ -123,13 +160,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-[#ECEEEF]">
           <div style={boxStyle}>
             <Router>
-              <Routes>
-                <Route path="/" element={
-                  isLoggedInState ? <FirstScreenPage /> : <LoginPage onLoginSuccess={handleLoginSuccess} />
-                } />
-                <Route path="/temp-login" element={<TempLoginPage onLoginSuccess={handleLoginSuccess} />} />
-                <Route path="/oauth-success" element={<OAuthSuccess />} />
-              </Routes>
+              <AppContent />
             </Router>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
+import backgroundMusicFile from '../assets/best-adventure-ever-122726.mp3';
 
 interface MusicContextType {
   isMusicOn: boolean;
@@ -26,7 +27,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [isMusicOn, setIsMusicOn] = useState(true); // 기본적으로 음악 켜짐
   
   const backgroundMusic = useBackgroundMusic({
-    src: '/best-adventure-ever-122726.mp3',
+    src: backgroundMusicFile,
     volume: 0.3,
     loop: true,
     autoplay: true,
