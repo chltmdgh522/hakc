@@ -91,6 +91,12 @@ const MyPage: React.FC<{ onBack: () => void; onLogout?: () => void }> = ({ onBac
       await AuthService.logout();
       console.log('🔍 MyPage: AuthService.logout() 완료');
       
+      // 개발 환경에서 로그 확인을 위한 대기
+      if (import.meta.env.DEV) {
+        console.log('🔍 MyPage: 개발 환경 - 로그 확인을 위해 2초 대기...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      
       // 부모 컴포넌트의 onLogout 콜백 호출 (이것만으로 충분)
       console.log('🔍 MyPage: onLogout 콜백 호출 시작');
       if (onLogout) {
@@ -102,6 +108,12 @@ const MyPage: React.FC<{ onBack: () => void; onLogout?: () => void }> = ({ onBac
       
     } catch (error) {
       console.error('🔍 MyPage: 로그아웃 중 오류:', error);
+      
+      // 개발 환경에서 로그 확인을 위한 대기
+      if (import.meta.env.DEV) {
+        console.log('🔍 MyPage: 오류 발생 후 로그 확인을 위해 2초 대기...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
       
       // 오류가 발생해도 부모 컴포넌트의 onLogout 콜백 호출
       console.log('🔍 MyPage: 오류 발생 후 onLogout 콜백 호출');
