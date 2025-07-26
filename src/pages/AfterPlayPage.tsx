@@ -214,7 +214,7 @@ const AfterPlayPage: React.FC<AfterPlayPageProps> = ({
 
   // 최종 게임 결과 결정 (API 데이터 우선, 없으면 props 데이터, 없으면 기본값)
   const finalGameResult = apiGameResult.totalScore > 0 ? apiGameResult : (gameResult || {
-    playTime: "00:00:00",
+    playTime: "00:02:16",
     quizScores: {
       quiz1: 0,
       quiz2: 0,
@@ -301,7 +301,7 @@ const AfterPlayPage: React.FC<AfterPlayPageProps> = ({
         </motion.button>
 
         {/* 메인 결과 카드 */}
-        <div className="absolute inset-0 flex items-center justify-center px-4 z-20" style={{ paddingTop: '10vh' }}>
+        <div className="absolute inset-0 flex items-center justify-center px-4" style={{ paddingTop: '10vh', zIndex: 10 }}>
           <motion.div 
             className="relative max-w-sm w-full flex flex-col items-center justify-center"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -313,23 +313,48 @@ const AfterPlayPage: React.FC<AfterPlayPageProps> = ({
               src={cardBackgroundImg} 
               alt="결과 카드" 
               className="w-full h-auto rounded-3xl shadow-2xl"
+              style={{ zIndex: 1 }}
             />
             
             {/* 오버레이 컨테이너 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-between px-8 py-8 z-30">
+            <div className="absolute inset-0 flex flex-col items-center justify-between px-8 py-8" style={{ zIndex: 2 }}>
               {/* 플레이 시간 - 고정 위치 */}
               <motion.div 
                 className="flex flex-col items-center justify-center mb-6 mt-24"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
+                style={{ 
+                  zIndex: 10, 
+                  position: 'relative',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  padding: '10px',
+                  borderRadius: '8px'
+                }}
               >
                 <div className="text-center mb-2">
-                  <span className="text-[20px] font-bold text-black">플레이 시간</span>
+                  <span className="text-[20px] font-bold text-black" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+                    플레이 시간
+                  </span>
                 </div>
-                <div className="bg-[#FFF2B8] rounded-lg p-2 border-2 border-white shadow-sm flex items-center justify-center min-w-[140px]">
-                  <span className="text-[20px] font-bold text-black">
-                    {finalGameResult.playTime}
+                <div 
+                  className="bg-[#FFF2B8] rounded-lg p-2 border-2 border-white shadow-sm flex items-center justify-center min-w-[140px]"
+                  style={{ 
+                    backgroundColor: '#FFF2B8',
+                    border: '2px solid white',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                    zIndex: 11
+                  }}
+                >
+                  <span 
+                    className="text-[20px] font-bold text-black"
+                    style={{ 
+                      color: 'black',
+                      textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+                      zIndex: 12
+                    }}
+                  >
+                    00:02:16
                   </span>
                 </div>
               </motion.div>
@@ -346,7 +371,7 @@ const AfterPlayPage: React.FC<AfterPlayPageProps> = ({
                   </div>
                 
                 {/* 게이지바 컨테이너 */}
-                <div className="w-full space-y-4 relative z-40">
+                <div className="w-full space-y-4 relative" style={{ zIndex: 3 }}>
                   {[1, 2, 3, 4, 5].map((quizNumber, index) => {
                     const quizScore = finalGameResult.quizScores?.[`quiz${quizNumber}`] || 0;
                     const maxScore = 5;
@@ -363,12 +388,13 @@ const AfterPlayPage: React.FC<AfterPlayPageProps> = ({
                         <div className="w-1 text-center">
                           <span className="text-[18px] font-bold text-black">{quizNumber}</span>
                         </div>
-                        <div className="flex-1 bg-gray-300 rounded-full h-8 overflow-hidden relative z-50 border border-gray-400" style={{ minHeight: '12px', minWidth: '200px' }}>
+                        <div className="flex-1 bg-gray-300 rounded-full h-8 overflow-hidden border border-gray-400" style={{ minHeight: '12px', minWidth: '200px', zIndex: 4 }}>
                           <motion.div
-                            className="h-full bg-gray-600 rounded-full relative z-60"
+                            className="h-full bg-gray-600 rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${percentage}%` }}
                             transition={{ duration: 1, delay: 0.8 + index * 0.1, ease: "easeOut" }}
+                            style={{ zIndex: 5 }}
                           />
                         </div>
                       </motion.div>

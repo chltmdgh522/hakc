@@ -77,6 +77,12 @@ class ApiClient {
       // 응답 로깅
       this.logApiResponse(method, url, response.status, response.statusText);
 
+      // 로그아웃 API의 경우 401, 403 에러도 성공으로 처리
+      if (endpoint === '/oauth2/logout' && (response.status === 401 || response.status === 403)) {
+        console.log(`[API] 로그아웃 API - ${response.status} 응답을 성공으로 처리 (토큰이 만료되었거나 유효하지 않음)`);
+        return {} as T;
+      }
+
       if (!response.ok) {
         const errorText = await response.text();
         this.logApiError(method, url, response.status, errorText);

@@ -38,7 +38,7 @@ const GAP_PCT = 2.5; // 버튼 사이 여백(%) - 원하는 만큼 조정
 
 const RECORD_TOP_PCT = ADVENTURE_TOP_PCT + BUTTON_HEIGHT_PCT + GAP_PCT;
 
-const FirstScreenPage: React.FC = () => {
+const FirstScreenPage: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const [step, setStep] = useState<'login' | 'fade' | 'nickname' | 'welcome' | 'shattered' | 'questAccept' | 'crownShine' | 'record' | 'quest1' | 'q1Success' | 'quest2' | 'q2Success' | 'quest3' | 'q3Success' | 'quest4' | 'q4Success' | 'quest5' | 'afterSuccess' | 'finalMessage' | 'mypage'>('login');
   const [nickname, setNickname] = useState<string>('');
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -145,7 +145,7 @@ const FirstScreenPage: React.FC = () => {
   };
 
   if (step === 'mypage') {
-    return <MyPage onBack={() => setStep('login')} />;
+    return <MyPage onBack={() => setStep('login')} onLogout={onLogout} />;
   }
   if (step === 'fade') {
     return (

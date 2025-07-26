@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import crownImg from '../assets/성공왕관.png';
 import profileImgSrc from '../assets/12_그림.png';
 import { getUserInfo } from '../utils/auth';
 import { AuthService } from '../services/authService';
 import type { MyPageResponse } from '../types/api';
+import SettingsIcon from '../components/SettingsIcon';
+import SettingsModal from '../components/SettingsModal';
 
 interface MyPageData {
   nickname: string;
@@ -13,10 +16,13 @@ interface MyPageData {
   profileImage?: string;
 }
 
-const MyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const MyPage: React.FC<{ onBack: () => void; onLogout?: () => void }> = ({ onBack, onLogout }) => {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState<MyPageData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const loadMyPageData = async () => {
@@ -73,12 +79,50 @@ const MyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   }, []);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return; // 중복 클릭 방지
+    
+    console.log('🔍 MyPage: handleLogout 시작');
+    setIsLoggingOut(true);
+    
     try {
+      console.log('🔍 MyPage: AuthService.logout() 호출 시작');
+      
+      // AuthService.logout() 호출 (모든 로그아웃 처리를 포함)
       await AuthService.logout();
-      // 로그아웃 후 로그인 페이지로 이동
-      window.location.reload();
+      console.log('🔍 MyPage: AuthService.logout() 완료');
+      
+      // 개발 환경에서 로그 확인을 위한 대기
+      if (import.meta.env.DEV) {
+        console.log('🔍 MyPage: 개발 환경 - 로그 확인을 위해 2초 대기...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      
+      // 부모 컴포넌트의 onLogout 콜백 호출 (이것만으로 충분)
+      console.log('🔍 MyPage: onLogout 콜백 호출 시작');
+      if (onLogout) {
+        onLogout();
+        console.log('🔍 MyPage: onLogout 콜백 호출 완료');
+      } else {
+        console.log('🔍 MyPage: onLogout 콜백이 없음!');
+      }
+      
     } catch (error) {
-      console.error('로그아웃 실패:', error);
+      console.error('🔍 MyPage: 로그아웃 중 오류:', error);
+      
+      // 개발 환경에서 로그 확인을 위한 대기
+      if (import.meta.env.DEV) {
+        console.log('🔍 MyPage: 오류 발생 후 로그 확인을 위해 2초 대기...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      
+      // 오류가 발생해도 부모 컴포넌트의 onLogout 콜백 호출
+      console.log('🔍 MyPage: 오류 발생 후 onLogout 콜백 호출');
+      if (onLogout) {
+        onLogout();
+      }
+    } finally {
+      console.log('🔍 MyPage: handleLogout 완료, isLoggingOut = false');
+      setIsLoggingOut(false);
     }
   };
 
@@ -219,7 +263,7 @@ const MyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           style={{
             width: '80%',
             padding: '18px 0',
-            background: '#5B93C6',
+            background: isLoggingOut ? '#9CA3AF' : '#5B93C6',
             border: 'none',
             borderRadius: 16,
             fontWeight: 'bold',
@@ -227,14 +271,32 @@ const MyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             color: '#fff',
             marginTop: 18,
             boxShadow: '0 4px 16px rgba(91, 147, 198, 0.08)',
-            cursor: 'pointer',
-            transition: 'background 0.2s',
+            cursor: isLoggingOut ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
           }}
-          whileHover={{ background: '#1e3a8a', scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleLogout}
+          whileHover={!isLoggingOut ? { background: '#1e3a8a', scale: 1.02 } : {}}
+          whileTap={!isLoggingOut ? { scale: 0.98 } : {}}
+          onClick={isLoggingOut ? undefined : handleLogout}
+          disabled={isLoggingOut}
         >
-          로그아웃
+          {isLoggingOut && (
+            <div
+              style={{
+                width: '20px',
+                height: '20px',
+                border: '2px solid rgba(255,255,255,0.3)',
+                borderTop: '2px solid white',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}
+            />
+          )}
+          {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
         </motion.button>
       </motion.div>
     </div>

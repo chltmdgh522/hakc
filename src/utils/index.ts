@@ -9,6 +9,8 @@ export * from './gameUtils';
 
 // API 관련
 
+// TTS 관련
+export * from './tts';
 
 // 로깅 시스템
 export * from './logger';

@@ -388,6 +388,24 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           zIndex: 4
         }}
       >
+        {/* 로딩 스피너 */}
+        {isLoading && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "40px",
+              height: "40px",
+              border: "3px solid rgba(255, 193, 7, 0.3)",
+              borderTop: "3px solid #FFC107",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+              zIndex: 5
+            }}
+          />
+        )}
         <img
           src={kakaoLoginBtn}
           alt="카카오 로그인"
@@ -395,16 +413,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             width: "125%",
             maxWidth: "300px",
             height: "auto",
-            cursor: "pointer",
+            cursor: isLoading ? "not-allowed" : "pointer",
             userSelect: "none",
             transition: "all 0.3s ease",
-            filter: isHovered ? "brightness(1.2)" : "brightness(1)",
-            transform: isHovered ? "scale(1.05)" : "scale(1)"
+            filter: isLoading ? "brightness(0.7) grayscale(0.3)" : (isHovered ? "brightness(1.2)" : "brightness(1)"),
+            transform: isLoading ? "scale(0.95)" : (isHovered ? "scale(1.05)" : "scale(1)"),
+            opacity: isLoading ? 0.7 : 1
           }}
           draggable={false}
-          onClick={handleKakaoLogin}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onClick={isLoading ? undefined : handleKakaoLogin}
+          onMouseEnter={() => !isLoading && setIsHovered(true)}
+          onMouseLeave={() => !isLoading && setIsHovered(false)}
         />
       </div>
 
@@ -425,6 +444,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             zIndex: 3
           }}
         />
+      )}
+
+      {/* 에러 메시지 */}
+      {error && (
+        <div
+          style={{
+            position: "absolute",
+            top: "70%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "rgba(255, 0, 0, 0.9)",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            fontSize: "14px",
+            maxWidth: "80%",
+            textAlign: "center",
+            zIndex: 10,
+            animation: "fadeIn 0.3s ease-in"
+          }}
+        >
+          {error}
+        </div>
       )}
 
       {/* 설정 모달 */}
@@ -465,6 +507,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               opacity: 0.6;
               transform: translate(-50%, -50%) scale(1.1);
             }
+          }
+          
+          @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+          }
+          
+          @keyframes fadeIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) translateY(-10px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
           }
         `}
       </style>

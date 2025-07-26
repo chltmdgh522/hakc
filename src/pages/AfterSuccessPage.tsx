@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FadeOutCircle from "../components/FadeOutCircle";
 import AfterPlayPage from "./AfterPlayPage";
 import { endQuiz } from "../utils/gameApi";
+import { useMusic } from "../contexts/MusicContext";
 import backgroundImg from "../assets/폭죽_배경.png";
 import ment1Img from "../assets/마무리멘트1.png";
 import ment2Img from "../assets/마무리멘트_2.png";
 import ment3Img from "../assets/마무리멘트_3.png";
+import endingAudio from "../assets/Quiz_4/ending버전1.wav";
 
 interface AfterSuccessPageProps {
   onComplete?: () => void;
@@ -24,6 +26,8 @@ const AfterSuccessPage: React.FC<AfterSuccessPageProps> = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [showFadeIn, setShowFadeIn] = useState(false);
   const [showAfterPlay, setShowAfterPlay] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { backgroundMusic } = useMusic();
 
   const messages = [
     {
@@ -41,8 +45,37 @@ const AfterSuccessPage: React.FC<AfterSuccessPageProps> = ({
   ];
 
   useEffect(() => {
-    // 자동 전환 제거 - 클릭으로만 전환
-  }, []);
+    // 페이지 로드 시 기존 배경음악 일시정지
+    console.log('AfterSuccessPage: 기존 배경음악 일시정지');
+    backgroundMusic.pause();
+
+    // ending 오디오 재생
+    const playEndingAudio = () => {
+      try {
+        audioRef.current = new Audio(endingAudio);
+        audioRef.current.volume = 0.7; // 볼륨 설정
+        audioRef.current.loop = false; // 반복 재생 안함
+        audioRef.current.play().catch(error => {
+          console.error('Ending 오디오 재생 실패:', error);
+        });
+      } catch (error) {
+        console.error('Ending 오디오 초기화 실패:', error);
+      }
+    };
+
+    playEndingAudio();
+
+    // 컴포넌트 언마운트 시 오디오 중지 및 배경음악 재생
+    return () => {
+      console.log('AfterSuccessPage: 컴포넌트 언마운트, 배경음악 재생');
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      // 배경음악 다시 재생
+      backgroundMusic.play();
+    };
+  }, [backgroundMusic]);
 
   const handleNextMessage = async () => {
     console.log('AfterSuccessPage: handleNextMessage 호출됨, currentStep:', currentStep);
@@ -75,6 +108,13 @@ const AfterSuccessPage: React.FC<AfterSuccessPageProps> = ({
 
   const handleFadeInComplete = () => {
     console.log('AfterSuccessPage: FadeInCircle 완료, AfterPlayPage 시작');
+    // FadeInCircle 완료 시 오디오 중지 및 배경음악 재생
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    // 배경음악 다시 재생
+    backgroundMusic.play();
     setShowAfterPlay(true);
   };
 
