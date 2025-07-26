@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchAIAnalysis } from '../utils/gameApi';
 
 interface AnalysisData {
   summary: string;
@@ -40,22 +41,10 @@ const AnalysisListPage: React.FC<AnalysisListPageProps> = ({ onBack, quizRecordI
         setLoading(true);
         setError(null);
         
-        console.log('AI 분석 API 호출:', `/api/record/ai/${quizRecordId}`);
+        console.log('AI 분석 API 호출:', quizRecordId);
         
-        // 실제 API 호출
-        const response = await fetch(`/api/record/ai/${quizRecordId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('AI 분석 데이터를 불러오는데 실패했습니다.');
-        }
-
-        const aiData = await response.json();
+        // gameApi의 fetchAIAnalysis 함수 사용
+        const aiData = await fetchAIAnalysis(quizRecordId);
         console.log('AI 분석 API 응답:', aiData);
         
         // API 응답 구조에 맞게 변환
@@ -67,13 +56,38 @@ const AnalysisListPage: React.FC<AnalysisListPageProps> = ({ onBack, quizRecordI
             training: aiData[3].content,
             guide: aiData[4].content,
           });
+        } else if (aiData && aiData.length > 0) {
+          // 데이터가 5개 미만이어도 사용 가능한 데이터만이라도 표시
+          const defaultData = {
+            summary: aiData[0]?.content || '분석 데이터를 불러오는 중입니다.',
+            strengths: aiData[1]?.content || '강점 분석을 준비 중입니다.',
+            cautions: aiData[2]?.content || '주의 영역 분석을 준비 중입니다.',
+            training: aiData[3]?.content || '훈련 제안을 준비 중입니다.',
+            guide: aiData[4]?.content || '행동 가이드를 준비 중입니다.',
+          };
+          setData(defaultData);
         } else {
-          throw new Error('AI 분석 데이터 형식이 올바르지 않습니다.');
+          // 기본 데이터 설정
+          setData({
+            summary: 'AI 분석이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.',
+            strengths: '강점 분석을 준비 중입니다.',
+            cautions: '주의 영역 분석을 준비 중입니다.',
+            training: '훈련 제안을 준비 중입니다.',
+            guide: '행동 가이드를 준비 중입니다.',
+          });
         }
         
       } catch (error) {
         console.error('AI 분석 데이터 로드 실패:', error);
-        setError('AI 분석 데이터를 불러오는데 실패했습니다.');
+        // 에러가 발생해도 기본 데이터를 표시
+        setData({
+          summary: 'AI 분석 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          strengths: '강점 분석을 준비 중입니다.',
+          cautions: '주의 영역 분석을 준비 중입니다.',
+          training: '훈련 제안을 준비 중입니다.',
+          guide: '행동 가이드를 준비 중입니다.',
+        });
+        setError(null); // 에러 상태를 해제하여 기본 데이터가 표시되도록 함
       } finally {
         setLoading(false);
       }
