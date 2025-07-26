@@ -1,3 +1,36 @@
+//{
+//  "compilerOptions": {
+//    "target": "ES2020",
+//    "useDefineForClassFields": true,
+//    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+//    "module": "ESNext",
+//    "skipLibCheck": true,
+//
+//    /* Bundler mode */
+//    "moduleResolution": "bundler",
+//    "allowImportingTsExtensions": true,
+//    "resolveJsonModule": true,
+//    "isolatedModules": true,
+//    "noEmit": true,
+//    "jsx": "react-jsx",
+//
+//    /* Linting - 모든 검사 비활성화 */
+//    "strict": false,
+//    "noUnusedLocals": false,
+//    "noUnusedParameters": false,
+//    "noFallthroughCasesInSwitch": false,
+//    "noImplicitAny": false,
+//    "noImplicitReturns": false,
+//    "noImplicitThis": false,
+//    "noUncheckedIndexedAccess": false,
+//    "noImplicitOverride": false,
+//    "noPropertyAccessFromIndexSignature": false,
+//    "exactOptionalPropertyTypes": false,
+//    "allowUnusedLabels": true,
+//    "allowUnreachableCode": true
+//  },
+//  "include": ["src"]
+//}
 {
   "compilerOptions": {
     "target": "ES2020",
@@ -5,6 +38,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "allowJs": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -14,7 +48,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting - 모든 검사 비활성화 */
+    /* Linting - 모든 엄격한 체크 비활성화 */
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -22,12 +56,16 @@
     "noImplicitAny": false,
     "noImplicitReturns": false,
     "noImplicitThis": false,
-    "noUncheckedIndexedAccess": false,
+    "strictNullChecks": false,
+    "strictBindCallApply": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+    "exactOptionalPropertyTypes": false,
     "noImplicitOverride": false,
     "noPropertyAccessFromIndexSignature": false,
-    "exactOptionalPropertyTypes": false,
-    "allowUnusedLabels": true,
-    "allowUnreachableCode": true
+    "noUncheckedIndexedAccess": false,
+    "allowUnreachableCode": true,
+    "allowUnusedLabels": true
   },
   "include": ["src"]
 }

@@ -8,7 +8,7 @@ export * from './animations';
 export * from './gameUtils';
 
 // API 관련
-export * from './api';
+
 
 // 로깅 시스템
 export * from './logger';
